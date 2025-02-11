@@ -1,5 +1,73 @@
 # M5-REPASO-RETO
 
+#Modelo ER
+![Modelo ER](https://github.com/ivanotalvaro/M5-REPASO-RETO/blob/main/modeloER.png)
+
+#Sentencias SQL
+```sql
+CREATE TABLE IF NOT EXISTS public.clientes
+(
+    id character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    nombre character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    correo character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    telefono character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    direccion text COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT clientes_pkey PRIMARY KEY (id),
+    CONSTRAINT clientes_correo_key UNIQUE (correo)
+);
+
+CREATE TABLE IF NOT EXISTS public.historial_prestamos
+(
+    id serial NOT NULL,
+    prestamo_id integer NOT NULL,
+    monto_solicitado numeric(15, 2) NOT NULL,
+    estado character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    fecha_creacion timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT historial_prestamos_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS public.prestamos
+(
+    id serial NOT NULL,
+    cliente_id character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    monto numeric(15, 2) NOT NULL,
+    interes numeric(5, 2) NOT NULL,
+    duracion_meses integer NOT NULL,
+    estado character varying(10) COLLATE pg_catalog."default" NOT NULL DEFAULT 'Pendiente'::character varying,
+    CONSTRAINT prestamos_pkey PRIMARY KEY (id)
+);
+
+ALTER TABLE IF EXISTS public.historial_prestamos
+    ADD CONSTRAINT fk_prestamo FOREIGN KEY (prestamo_id)
+    REFERENCES public.prestamos (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE RESTRICT;
+
+
+ALTER TABLE IF EXISTS public.prestamos
+    ADD CONSTRAINT fk_cliente FOREIGN KEY (cliente_id)
+    REFERENCES public.clientes (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE RESTRICT;
+
+END;
+
+-----Insert
+INSERT INTO public.clientes(
+	id, nombre, correo, telefono, direccion)
+	VALUES ('1','Cliente 1', 'cliente1@prueba.com','3108423434','Direccion 1');
+
+INSERT INTO public.clientes(
+	id, nombre, correo, telefono, direccion)
+	VALUES ('2','Cliente2', 'cliente2@prueba.com','3108423435','Direccion 2');
+
+INSERT INTO public.clientes(
+	id, nombre, correo, telefono, direccion)
+	VALUES ('3','Cliente 3', 'cliente3@prueba.com','3108423436','Direccion 3');
+```
+---
+
 # Repaso: Aplicación de Gestión de Préstamos Bancarios con Spring Boot y PostgreSQL
 > **Larry M. Ramírez - Coach Técnico**
 
