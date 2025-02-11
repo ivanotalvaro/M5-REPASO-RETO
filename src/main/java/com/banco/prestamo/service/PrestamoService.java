@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,13 +35,14 @@ public class PrestamoService {
         prestamo.setInteres(prestamoDTO.getInteres());
         prestamo.setDuracionMeses(prestamoDTO.getDuracionMeses());
         prestamo.setEstado("Pendiente");
-
         prestamo = prestamoRepository.save(prestamo);
 
         HistorialPrestamo historial = new HistorialPrestamo();
         historial.setPrestamoId(prestamo.getId());
         historial.setMontoSolicitado(prestamo.getMonto());
         historial.setEstado("Pendiente");
+        historial.setFechaCreacion(LocalDateTime.now());
+        historial.setFechaActualizacion(LocalDateTime.now());
         historialRepository.save(historial);
 
         return mapToDTO(prestamo);
@@ -62,6 +64,8 @@ public class PrestamoService {
         historial.setPrestamoId(prestamo.getId());
         historial.setMontoSolicitado(prestamo.getMonto());
         historial.setEstado(prestamo.getEstado());
+        historial.setFechaCreacion(LocalDateTime.now());
+        historial.setFechaActualizacion(LocalDateTime.now());
         historialRepository.save(historial);
 
         return mapToDTO(prestamo);
