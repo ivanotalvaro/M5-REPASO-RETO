@@ -1,10 +1,12 @@
 package com.banco.prestamo.controller;
+
 import com.banco.prestamo.domain.dto.*;
 import com.banco.prestamo.service.PrestamoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -15,7 +17,7 @@ public class PrestamoController {
     private final PrestamoService prestamoService;
 
     @PostMapping
-    public ResponseEntity<PrestamoDTO> solicitarPrestamo(@RequestBody PrestamoDTO prestamoDTO) {
+    public ResponseEntity<PrestamoDTO> solicitarPrestamo(@RequestBody @Valid PrestamoDTO prestamoDTO) {
         return ResponseEntity.ok(prestamoService.solicitarPrestamo(prestamoDTO));
     }
 
@@ -45,9 +47,9 @@ public class PrestamoController {
 
     @GetMapping("/simular")
     public ResponseEntity<SimulacionCuotaDTO> simularCuota(
-            @RequestParam BigDecimal monto,
-            @RequestParam BigDecimal interes,
-            @RequestParam Integer duracionMeses) {
+            @RequestParam @Valid BigDecimal monto,
+            @RequestParam @Valid BigDecimal interes,
+            @RequestParam @Valid Integer duracionMeses) {
         return ResponseEntity.ok(prestamoService.simularCuota(monto, interes, duracionMeses));
     }
 }
