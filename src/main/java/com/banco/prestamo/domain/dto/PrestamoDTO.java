@@ -2,7 +2,7 @@ package com.banco.prestamo.domain.dto;
 
 import lombok.Data;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 @Data
@@ -24,11 +24,6 @@ public class PrestamoDTO {
     @Min(value = 1, message = "La duración debe ser al menos de 1 mes")
     private Integer duracionMeses;
 
-    @NotBlank(message = "El estado no puede estar vacío")
-    @Size(max = 10, message = "El estado no puede tener más de 10 caracteres")
     private String estado;
-
-    @NotNull(message = "La cuota mensual no puede estar vacía")
-    @DecimalMin(value = "0.0", inclusive = false, message = "La cuota mensual debe ser mayor que cero")
     private BigDecimal cuotaMensual;
 }

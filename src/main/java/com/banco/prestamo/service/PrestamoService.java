@@ -2,8 +2,11 @@ package com.banco.prestamo.service;
 
 import com.banco.prestamo.domain.HistorialPrestamo;
 import com.banco.prestamo.domain.Prestamo;
+import com.banco.prestamo.domain.SimulacionCuota;
 import com.banco.prestamo.domain.dto.*;
 import com.banco.prestamo.exception.ResourceNotFoundException;
+import com.banco.prestamo.mapper.HistorialPrestamoMapper;
+import com.banco.prestamo.mapper.PrestamoMapper;
 import com.banco.prestamo.repository.ClienteRepository;
 import com.banco.prestamo.repository.HistorialPrestamoRepository;
 import com.banco.prestamo.repository.PrestamoRepository;
@@ -22,6 +25,8 @@ public class PrestamoService {
     private final PrestamoRepository prestamoRepository;
     private final HistorialPrestamoRepository historialRepository;
     private final ClienteRepository clienteRepository;
+    private final PrestamoMapper prestamoMapper = PrestamoMapper.INSTANCE;
+    private final HistorialPrestamoMapper historialPrestamoMapper = HistorialPrestamoMapper.INSTANCE;
 
     @Transactional
     public PrestamoDTO solicitarPrestamo(PrestamoDTO prestamoDTO) {
@@ -29,7 +34,7 @@ public class PrestamoService {
             throw new ResourceNotFoundException("Cliente no encontrado");
         }
 
-        Prestamo prestamo = new Prestamo();
+        Prestamo prestamo = prestamoMapper.prestamoDTOToPrestamo(prestamoDTO);
         prestamo.setClienteId(prestamoDTO.getClienteId());
         prestamo.setMonto(prestamoDTO.getMonto());
         prestamo.setInteres(prestamoDTO.getInteres());
@@ -45,7 +50,7 @@ public class PrestamoService {
         historial.setFechaActualizacion(LocalDateTime.now());
         historialRepository.save(historial);
 
-        return mapToDTO(prestamo);
+        return prestamoMapper.prestamoToPrestamoDTO(prestamo);
     }
 
     @Transactional
@@ -64,7 +69,7 @@ public class PrestamoService {
         historial.setPrestamoId(prestamo.getId());
         historial.setMontoSolicitado(prestamo.getMonto());
         historial.setEstado(prestamo.getEstado());
-        historial.setFechaCreacion(LocalDateTime.now());
+        //historial.setFechaCreacion(LocalDateTime.now());
         historial.setFechaActualizacion(LocalDateTime.now());
         historialRepository.save(historial);
 
@@ -94,7 +99,11 @@ public class PrestamoService {
                 .collect(Collectors.toList());
     }
 
-    public SimulacionCuotaDTO simularCuota(BigDecimal monto, BigDecimal interes, Integer duracionMeses) {
+    public SimulacionCuota simularCuota(BigDecimal monto, BigDecimal interes, Integer duracionMeses) {
+        if (duracionMeses == null || duracionMeses == 0) {
+            throw new IllegalArgumentException("La duración en meses no puede ser cero o nula");
+        }
+
         // Cálculo con interés simple
         BigDecimal interesTotal = monto.multiply(interes.divide(BigDecimal.valueOf(100)))
                 .multiply(BigDecimal.valueOf(duracionMeses))
@@ -102,7 +111,7 @@ public class PrestamoService {
         BigDecimal totalPagar = monto.add(interesTotal);
         BigDecimal cuotaMensual = totalPagar.divide(BigDecimal.valueOf(duracionMeses), 2, RoundingMode.HALF_UP);
 
-        SimulacionCuotaDTO simulacion = new SimulacionCuotaDTO();
+        SimulacionCuota simulacion = new SimulacionCuota();
         simulacion.setMonto(monto);
         simulacion.setInteres(interes);
         simulacion.setDuracionMeses(duracionMeses);
@@ -121,7 +130,7 @@ public class PrestamoService {
         dto.setEstado(prestamo.getEstado());
 
         // Calcular cuota mensual
-        SimulacionCuotaDTO simulacion = simularCuota(
+        SimulacionCuota simulacion = simularCuota(
                 prestamo.getMonto(),
                 prestamo.getInteres(),
                 prestamo.getDuracionMeses()

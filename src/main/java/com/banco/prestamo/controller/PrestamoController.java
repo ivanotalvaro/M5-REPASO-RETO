@@ -1,5 +1,6 @@
 package com.banco.prestamo.controller;
 
+import com.banco.prestamo.domain.SimulacionCuota;
 import com.banco.prestamo.domain.dto.*;
 import com.banco.prestamo.service.PrestamoService;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class PrestamoController {
     }
 
     @GetMapping("/simular")
-    public ResponseEntity<SimulacionCuotaDTO> simularCuota(
+    public ResponseEntity<SimulacionCuota> simularCuota(
             @RequestParam @Valid BigDecimal monto,
             @RequestParam @Valid BigDecimal interes,
             @RequestParam @Valid Integer duracionMeses) {
